@@ -1,235 +1,796 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#080a12" />
-  <title>Character Reflection Quiz</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root { --bg:#080a12; --panel:#121526; --text:#f5efff; --muted:#b1adc5; --plum:#542c61; --blue:#172a50; --lav:#c8b0e9; --line:rgba(198,171,227,.22); }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font-family:Nunito,Arial,sans-serif; overflow-x:hidden; }
-    body::before, body::after { content:""; position:fixed; width:70vmax; height:70vmax; border-radius:50%; filter:blur(75px); pointer-events:none; z-index:-1; }
-    body::before { top:-38vmax; left:-30vmax; background:radial-gradient(circle,rgba(97,43,107,.42),transparent 65%); }
-    body::after { bottom:-43vmax; right:-30vmax; background:radial-gradient(circle,rgba(32,61,121,.46),transparent 66%); }
-    .stars { position:fixed; inset:0; z-index:-1; pointer-events:none; background-image:radial-gradient(1px 1px at 12% 20%,#d7c4f5 98%,transparent),radial-gradient(1px 1px at 77% 13%,#d7c4f5 98%,transparent),radial-gradient(1px 1px at 85% 75%,#d7c4f5 98%,transparent),radial-gradient(1px 1px at 28% 86%,#d7c4f5 98%,transparent),radial-gradient(1px 1px at 58% 38%,#d7c4f5 98%,transparent); opacity:.45; }
-    .shell { width:min(100% - 32px, 660px); margin:0 auto; padding:40px 0 60px; }
-    header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:38px; color:var(--lav); font-size:.73rem; letter-spacing:.16em; font-weight:800; text-transform:uppercase; }
-    .sparkle { color:#ddc7ff; font-size:1.35rem; text-shadow:0 0 18px #b185e8; }
-    .card { position:relative; padding:clamp(26px,6vw,52px); background:linear-gradient(145deg,rgba(23,25,44,.95),rgba(12,14,26,.96)); border:1px solid var(--line); border-radius:28px; box-shadow:0 22px 80px rgba(0,0,0,.42),0 0 55px rgba(88,46,111,.12); overflow:hidden; animation:rise .35s ease both; }
-    .card::before { content:""; position:absolute; top:-125px; left:12%; width:75%; height:190px; border-radius:50%; background:rgba(92,49,117,.24); filter:blur(65px); pointer-events:none; }
-    .card > * { position:relative; }
-    h1,h2,h3 { font-family:'DM Serif Display',Georgia,serif; font-weight:400; letter-spacing:-.018em; }
-    h1 { font-size:clamp(2.8rem,9vw,4.3rem); line-height:1.04; margin:12px 0 18px; }
-    h2 { font-size:clamp(2rem,6vw,2.9rem); line-height:1.12; margin:14px 0 20px; }
-    h3 { font-size:1.65rem; margin:8px 0 12px; }
-    p { color:var(--muted); line-height:1.7; }
-    .eyebrow { text-transform:uppercase; font-size:.72rem; letter-spacing:.2em; font-weight:800; color:#c8aee9; }
-    .intro { max-width:480px; margin-bottom:30px; }
-    label { display:block; margin:18px 0 8px; color:#eee7fa; font-weight:700; font-size:.92rem; }
-    input, select { width:100%; background:#0f1426; border:1px solid #4b4263; border-radius:13px; padding:15px 16px; color:var(--text); font:inherit; outline:none; }
-    input:focus,select:focus { border-color:#b99ae7; box-shadow:0 0 0 3px rgba(171,125,229,.17); }
-    select { cursor:pointer; }
-    button { font:inherit; cursor:pointer; }
-    .primary { display:block; width:100%; margin-top:28px; padding:16px 20px; border-radius:14px; border:1px solid #ae88d3; background:linear-gradient(110deg,#634178,#40365f 65%,#2e4875); color:#fff; font-weight:800; letter-spacing:.015em; box-shadow:0 0 25px rgba(126,78,162,.28); transition:transform .18s,box-shadow .18s; }
-    .primary:hover { transform:translateY(-2px); box-shadow:0 0 35px rgba(151,98,196,.43); }
-    .secondary { border:1px solid #514664; background:transparent; color:#ded0f0; padding:13px 20px; border-radius:13px; }
-    .secondary:hover { background:#252139; }
-    .row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-    .progress { height:7px; margin:16px 0 30px; background:#27263b; border-radius:50px; overflow:hidden; }
-    .progress > div { height:100%; width:0; background:linear-gradient(90deg,#6e417d,#b49fe4,#4f76b7); border-radius:inherit; box-shadow:0 0 15px #a68dd8; transition:width .3s ease; }
-    .answers { display:grid; gap:12px; margin:26px 0; }
-    .answer { text-align:left; border:1px solid #46415d; border-radius:15px; background:#14182a; color:#e7e0f3; padding:17px 19px; transition:.18s; }
-    .answer:hover { border-color:#aa88d6; background:#221d36; }
-    .answer.selected { background:linear-gradient(110deg,#392343,#222e4b); border-color:#c1a2eb; box-shadow:0 0 0 1px rgba(193,162,235,.15),0 0 22px rgba(109,65,151,.17); }
-    .answer.selected::before { content:'✦ '; color:#d5b7ff; }
-    .actions { display:flex; gap:12px; align-items:center; }
-    .actions .primary { margin-top:0; }
-    .center { text-align:center; }
-    .orb { width:140px; height:140px; border-radius:50%; margin:20px auto 32px; background:radial-gradient(circle at 40% 35%,#c6a5ed 0%,#6a477e 25%,#283f73 58%,#111426 76%); box-shadow:0 0 35px #6e418b,0 0 90px rgba(55,79,153,.55); animation:pulse 2s ease-in-out infinite; }
-    .loading-track { width:100%; height:9px; background:#27263b; border-radius:50px; overflow:hidden; margin:30px 0 12px; }
-    .loading-fill { width:0; height:100%; background:linear-gradient(90deg,#653b7d,#b8a0ec,#4775b2); box-shadow:0 0 20px #b8a0ec; transition:width .2s linear; }
-    .result { padding:24px; margin:24px 0; border:1px solid rgba(204,171,237,.24); border-radius:18px; background:linear-gradient(135deg,rgba(82,45,99,.22),rgba(30,52,96,.23)); }
-    .result p { color:#e6def2; margin:0 0 15px; }
-    .result p:last-child { margin-bottom:0; }
-    .rating { display:flex; justify-content:space-between; gap:5px; margin:26px 0 10px; }
-    .rating button { width:10%; min-width:0; padding:12px 0; background:#171a2d; border:1px solid #514762; border-radius:10px; color:#e9e1f6; font-weight:800; }
-    .rating button.active { background:#694b86; border-color:#d1b3f4; box-shadow:0 0 18px rgba(154,110,202,.35); }
-    .tiny { color:#9e9ab3; font-size:.83rem; }
-    .error { color:#ffb7c7; min-height:1.3em; font-size:.87rem; }
-    footer { text-align:center; margin-top:26px; color:#79758d; font-size:.78rem; }
-    [hidden] { display:none !important; }
-    @keyframes rise { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes pulse { 50% { transform:scale(1.07); box-shadow:0 0 55px #8d5ca7,0 0 115px rgba(55,79,153,.7); } }
-    @media(max-width:450px) { .shell { padding-top:24px; } header { margin-bottom:22px; } .card { border-radius:20px; } .rating { gap:3px; } .rating button { font-size:.82rem; padding:10px 0; } }
-    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Character Reflection Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --black:#080a12;
+  --navy:#171d34;
+  --plum:#3d2349;
+  --purple:#a88bcf;
+  --white:#f5efff;
+  --muted:#b5aec9;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  min-height:100vh;
+  background:var(--black);
+  color:var(--white);
+  font-family:Nunito,Arial,sans-serif;
+}
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at 12% 10%,#522b604d,transparent 50%),
+    radial-gradient(ellipse at 90% 85%,#203d784d,transparent 55%);
+}
+body::after {
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.5;
+  background-image:
+    radial-gradient(1px 1px at 12% 22%,#fff 99%,transparent),
+    radial-gradient(1px 1px at 75% 13%,#fff 99%,transparent),
+    radial-gradient(1px 1px at 84% 73%,#fff 99%,transparent),
+    radial-gradient(1px 1px at 27% 88%,#fff 99%,transparent);
+}
+main {
+  position:relative;
+  z-index:1;
+  max-width:690px;
+  margin:auto;
+  padding:35px 16px 65px;
+}
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:#cbb6eb;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:35px;
+}
+.card {
+  position:relative;
+  overflow:hidden;
+  padding:clamp(25px,6vw,50px);
+  border:1px solid #59476a77;
+  border-radius:26px;
+  background:linear-gradient(145deg,#19192e,#0e1220);
+  box-shadow:0 25px 80px #0008,0 0 55px #552c6128;
+  animation:appear .4s ease;
+}
+.card::before {
+  content:"";
+  position:absolute;
+  width:80%;
+  height:130px;
+  top:-100px;
+  left:10%;
+  border-radius:50%;
+  background:#713d8b66;
+  filter:blur(65px);
+  pointer-events:none;
+}
+.card > * { position:relative; }
+h1,h2 {
+  font-family:"DM Serif Display",Georgia,serif;
+  font-weight:400;
+}
+h1 {
+  font-size:clamp(43px,8vw,67px);
+  line-height:1.07;
+  margin:14px 0 20px;
+}
+h2 {
+  font-size:clamp(30px,6vw,44px);
+  line-height:1.14;
+  margin:15px 0 20px;
+}
+p {
+  color:var(--muted);
+  line-height:1.75;
+}
+.eyebrow {
+  font-size:11px;
+  color:#c8b0e9;
+  text-transform:uppercase;
+  letter-spacing:3px;
+  font-weight:800;
+}
+label {
+  display:block;
+  margin:20px 0 9px;
+  font-size:14px;
+  font-weight:700;
+}
+input,select {
+  width:100%;
+  padding:15px;
+  background:#101426;
+  color:white;
+  border:1px solid #55476b;
+  border-radius:13px;
+  font:inherit;
+}
+input:focus,select:focus {
+  outline:2px solid #a88bcf;
+}
+button {
+  cursor:pointer;
+  font:inherit;
+}
+.primary {
+  width:100%;
+  padding:16px;
+  margin-top:25px;
+  color:white;
+  background:linear-gradient(110deg,#653a77,#40355f,#294773);
+  border:1px solid #a887d0;
+  border-radius:14px;
+  font-weight:800;
+  box-shadow:0 0 25px #8c5cb744;
+  transition:.2s;
+}
+.primary:hover {
+  transform:translateY(-2px);
+  box-shadow:0 0 35px #9d70d777;
+}
+.secondary {
+  padding:14px 20px;
+  color:#e4d6f5;
+  background:transparent;
+  border:1px solid #59476a;
+  border-radius:13px;
+}
+.progress {
+  height:7px;
+  background:#2a293d;
+  border-radius:20px;
+  overflow:hidden;
+  margin:20px 0 35px;
+}
+.progress div {
+  height:100%;
+  background:linear-gradient(90deg,#75418c,#c6b1ef,#5074b5);
+  box-shadow:0 0 15px #b6a1ed;
+  transition:width .3s;
+}
+.answers {
+  display:grid;
+  gap:12px;
+  margin:28px 0;
+}
+.answer {
+  text-align:left;
+  padding:17px;
+  color:#eee8fa;
+  background:#15192c;
+  border:1px solid #49405e;
+  border-radius:14px;
+  transition:.2s;
+}
+.answer:hover {
+  background:#27203c;
+  border-color:#b399db;
+}
+.answer.selected {
+  background:linear-gradient(110deg,#412747,#263452);
+  border-color:#cbb0ee;
+  box-shadow:0 0 22px #8651b244;
+}
+.answer.selected::before {
+  content:"✦ ";
+  color:#d4baff;
+}
+.actions {
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.actions .primary { margin-top:0; }
+.row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.center { text-align:center; }
+.orb {
+  width:145px;
+  height:145px;
+  border-radius:50%;
+  margin:30px auto;
+  background:radial-gradient(circle at 40% 30%,#c4a4ec,#724783 30%,#284276 65%,#101325 85%);
+  box-shadow:0 0 40px #774c98,0 0 90px #29447799;
+  animation:pulse 2s infinite;
+}
+.loading-track {
+  height:9px;
+  margin:30px 0 12px;
+  border-radius:30px;
+  overflow:hidden;
+  background:#29263b;
+}
+.loading-fill {
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#673b7d,#c6b0f0,#4976b8);
+  box-shadow:0 0 20px #c6b0f0;
+}
+.result {
+  padding:24px;
+  margin:25px 0;
+  background:linear-gradient(135deg,#512e613b,#1c35603b);
+  border:1px solid #b99bdb44;
+  border-radius:18px;
+}
+.result p {
+  color:#e9e1f4;
+  margin:0 0 17px;
+}
+.result p:last-child { margin-bottom:0; }
+.rating {
+  display:flex;
+  gap:5px;
+  margin:28px 0 12px;
+}
+.rating button {
+  flex:1;
+  min-width:0;
+  padding:12px 0;
+  border:1px solid #554765;
+  border-radius:9px;
+  background:#181a2e;
+  color:white;
+  font-weight:800;
+}
+.rating button.active {
+  background:#75518f;
+  border-color:#d1b5f5;
+  box-shadow:0 0 20px #aa7ed366;
+}
+.small {
+  font-size:12px;
+  color:#aaa4c0;
+}
+.error {
+  color:#ffb9ca;
+  font-size:13px;
+}
+footer {
+  text-align:center;
+  color:#77728c;
+  font-size:12px;
+  margin-top:30px;
+}
+[hidden] { display:none !important; }
+@keyframes appear {
+  from { opacity:0;transform:translateY(12px); }
+  to { opacity:1;transform:translateY(0); }
+}
+@keyframes pulse {
+  50% {
+    transform:scale(1.07);
+    box-shadow:0 0 60px #8959aa,0 0 115px #294477aa;
+  }
+}
+@media(max-width:450px) {
+  .rating { gap:3px; }
+  .rating button { font-size:12px;padding:11px 0; }
+}
+</style>
 </head>
+
 <body>
-  <div class="stars" aria-hidden="true"></div>
-  <main class="shell">
-    <header><span>✦ &nbsp; Character Reflection Quiz</span><span class="sparkle" aria-hidden="true">✧</span></header>
+<main>
+<header>
+  <span>✦ Character Reflection Quiz</span>
+  <span>✧</span>
+</header>
 
-    <section class="card" id="welcome">
-      <div class="eyebrow">An exploration of character</div>
-      <h1>What lies beneath<br>the surface?</h1>
-      <p class="intro">Take a moment to reflect on the qualities, patterns, and perspectives that shape a person.</p>
-      <form id="startForm">
-        <label for="personName">Name of the person you're reflecting on</label>
-        <input id="personName" name="personName" type="text" placeholder="Enter a first name" maxlength="40" autocomplete="off" required />
-        <label for="perspective">Who are you reflecting on?</label>
-        <select id="perspective" required>
-          <option value="" selected disabled>Select an option...</option>
-          <option value="self">Myself</option>
-          <option value="other">Someone else</option>
-        </select>
-        <button class="primary" type="submit">Begin Reflection ✦</button>
-      </form>
-    </section>
+<section class="card" id="welcome">
+  <div class="eyebrow">An exploration of character</div>
+  <h1>What lies beneath<br>the surface?</h1>
+  <p>
+    Take a moment to reflect on the qualities,
+    patterns, and perspectives that shape a person.
+  </p>
 
-    <section class="card" id="quiz" hidden>
-      <div class="row"><span class="eyebrow">Your reflection</span><span class="tiny" id="questionCount">01 / 10</span></div>
-      <div class="progress" aria-hidden="true"><div id="quizProgress"></div></div>
-      <h2 id="questionTitle"></h2>
-      <div class="answers" id="answers"></div>
-      <div class="actions"><button class="secondary" id="backButton" type="button">← Back</button><button class="primary" id="nextButton" type="button">Continue →</button></div>
-      <p class="error" id="quizError" role="alert"></p>
-    </section>
+  <form id="startForm">
+    <label for="personName">
+      Name of the person you're reflecting on
+    </label>
+    <input
+      id="personName"
+      type="text"
+      placeholder="Enter a first name"
+      maxlength="40"
+      required
+    >
 
-    <section class="card center" id="loading" hidden aria-live="polite">
-      <div class="eyebrow">Your character reflection</div>
-      <div class="orb" aria-hidden="true"></div>
-      <h2>Calculating your results...</h2>
-      <p id="loadingMessage">Reviewing your responses</p>
-      <div class="loading-track"><div class="loading-fill" id="loadingFill"></div></div>
-      <div class="tiny" id="loadingPercent">0%</div>
-    </section>
+    <label for="perspective">
+      Who are you reflecting on?
+    </label>
+    <select id="perspective" required>
+      <option value="">Select an option...</option>
+      <option value="self">Myself</option>
+      <option value="other">Someone else</option>
+    </select>
 
-    <section class="card" id="results" hidden>
-      <div class="eyebrow">Your character reflection is ready ✦</div>
-      <h2 id="resultHeading"></h2>
-      <p>A closer look at the qualities that make this person unique.</p>
-      <div class="result" id="resultBody"></div>
-      <button class="primary" id="rateButton" type="button">Continue to Accuracy Rating →</button>
-    </section>
+    <button class="primary" type="submit">
+      Begin Reflection ✦
+    </button>
+  </form>
+</section>
 
-    <section class="card" id="ratingScreen" hidden>
-      <div class="eyebrow">One final reflection</div>
-      <h2>How accurate was this description?</h2>
-      <p id="ratingPrompt"></p>
-      <div class="rating" id="ratingButtons" role="group" aria-label="Accuracy rating from 1 to 10"></div>
-      <div class="row tiny"><span>1 · Not accurate</span><span>10 · Extremely accurate</span></div>
-      <p class="error" id="ratingError" role="alert"></p>
-      <button class="primary" id="submitRating" type="button">Submit My Rating ✦</button>
-    </section>
+<section class="card" id="quiz" hidden>
+  <div class="row">
+    <span class="eyebrow">Your reflection</span>
+    <span class="small" id="questionCount"></span>
+  </div>
+  <div class="progress">
+    <div id="quizProgress"></div>
+  </div>
+  <h2 id="questionTitle"></h2>
+  <div class="answers" id="answers"></div>
 
-    <section class="card center" id="thanks" hidden>
-      <div class="eyebrow">Reflection complete</div>
-      <div style="font-size:3.5rem;color:#c8b0e9;text-shadow:0 0 28px #9163c4;margin:15px 0" aria-hidden="true">✦</div>
-      <h2>Thank you for reflecting.</h2>
-      <p>Your character reflection is complete.</p>
-      <button class="primary" id="restart" type="button">Start a New Reflection</button>
-    </section>
-    <footer>✦ &nbsp; Character Reflection Quiz &nbsp; ✦</footer>
-  </main>
-  <script>
-    // EDIT QUESTIONS HERE. Each question has four choices.
-    const questions = [
-      { self:'How do you typically recharge after a long day?', other:'How does this person typically recharge after a long day?', choices:['Spending quiet time alone','Talking or spending time with others','Doing something creative or active','It depends on the day'] },
-      { self:'When facing a difficult decision, what guides you most?', other:'When facing a difficult decision, what guides this person most?', choices:['Logic and careful reasoning','Gut feelings and intuition','Advice from people I trust','A combination of all three'] },
-      { self:'How do you usually respond to criticism?', other:'How does this person usually respond to criticism?', choices:['I reflect on it and try to improve','I feel it deeply, even if I don’t show it','I consider whether it seems fair','My response depends on who says it'] },
-      { self:'What motivates you most when working toward a goal?', other:'What motivates this person most when working toward a goal?', choices:['Personal growth and improvement','Making others proud or helping them','Achieving something meaningful','The satisfaction of finishing what I start'] },
-      { self:'How do you respond when plans unexpectedly change?', other:'How does this person respond when plans unexpectedly change?', choices:['I adapt quickly and go with it','I need a little time to adjust','I try to make a new plan right away','It depends on how important the plans were'] },
-      { self:'How comfortable are you expressing your emotions?', other:'How comfortable is this person expressing their emotions?', choices:['Very comfortable with most people','Comfortable with people I trust','I usually keep my feelings private','It depends on the emotion'] },
-      { self:'What role do you naturally take in a group?', other:'What role does this person naturally take in a group?', choices:['The organizer or leader','The listener who supports others','The creative idea person','The person who keeps everyone connected'] },
-      { self:'How often do you question your own decisions?', other:'How often does this person question their own decisions?', choices:['Rarely — I usually feel confident','Sometimes, especially with big decisions','Often — I like to consider alternatives','It varies depending on the situation'] },
-      { self:'Which quality matters most to you in relationships?', other:'Which quality seems to matter most to this person in relationships?', choices:['Honesty and trust','Loyalty and dependability','Understanding and empathy','Fun and shared experiences'] },
-      { self:'How well do you feel you understand yourself?', other:'How well do you feel you understand this person?', choices:['Extremely well','Pretty well, with a few surprises','Somewhat — there is still a lot to learn','I’m still figuring that out'] }
-    ];
+  <div class="actions">
+    <button class="secondary" id="backButton">
+      ← Back
+    </button>
+    <button class="primary" id="nextButton">
+      Continue →
+    </button>
+  </div>
+  <p class="error" id="quizError"></p>
+</section>
 
-    // EDIT THE TWO RESULTS HERE. Quiz answers do NOT change the result.
-    const resultSelf = [
-      'You care about how others see you, but you also want to be recognized for who you really are. You have strengths that people notice and other qualities that you sometimes keep to yourself.',
-      'Although you can be confident in your choices, there are moments when you wonder whether you are on the right path. You value connection and understanding, but you also need space to make decisions on your own terms.',
-      'You have abilities and potential that you have not fully explored. You tend to hold yourself to standards that others may not realize, and you are still discovering what matters most to you.'
-    ];
-    const resultOther = [
-      '{name} values meaningful connections but may not always show others exactly what is going on beneath the surface. People can see certain strengths in {name}, while other qualities take more time to recognize.',
-      'At times, {name} appears confident and sure of what to do, but there are also moments of uncertainty and reflection. {name} appreciates being understood and respected, while still wanting the freedom to make independent choices.',
-      '{name} has abilities and potential that may not yet be fully realized. Although others may not always notice it, {name} can place high expectations on personal decisions and is continuing to grow and discover what matters most.'
-    ];
+<section class="card center" id="loading" hidden>
+  <div class="eyebrow">Your character reflection</div>
+  <div class="orb"></div>
+  <h2>Calculating your results...</h2>
+  <p id="loadingMessage">Reviewing your responses...</p>
+  <div class="loading-track">
+    <div class="loading-fill" id="loadingFill"></div>
+  </div>
+  <p class="small" id="loadingPercent">0%</p>
+</section>
 
-    let personName='', perspective='', index=0, selected=Array(questions.length).fill(null), rating=null;
-    const $=id=>document.getElementById(id);
-    const screens=['welcome','quiz','loading','results','ratingScreen','thanks'];
-    function show(id) { screens.forEach(s=>$(s).hidden=s!==id); window.scrollTo({top:0,behavior:'instant'}); }
-    function renderQuestion() {
-      const q=questions[index];
-      $('questionCount').textContent=`${String(index+1).padStart(2,'0')} / ${questions.length}`;
-      $('quizProgress').style.width=`${(index+1)/questions.length*100}%`;
-      $('questionTitle').textContent=perspective==='self'?q.self:q.other;
-      $('answers').replaceChildren();
-      q.choices.forEach((choice,i)=>{
-        const btn=document.createElement('button'); btn.type='button'; btn.className='answer'+(selected[index]===i?' selected':'');
-        btn.textContent=choice; btn.setAttribute('aria-pressed',String(selected[index]===i));
-        btn.onclick=()=>{selected[index]=i; $('quizError').textContent=''; renderQuestion();};
-        $('answers').appendChild(btn);
+<section class="card" id="results" hidden>
+  <div class="eyebrow">Your reflection is ready ✦</div>
+  <h2 id="resultHeading"></h2>
+  <p>A closer look at the qualities that shape character.</p>
+  <div class="result" id="resultBody"></div>
+  <button class="primary" id="rateButton">
+    Continue to Accuracy Rating →
+  </button>
+</section>
+
+<section class="card" id="ratingScreen" hidden>
+  <div class="eyebrow">One final reflection</div>
+  <h2>How accurate was this description?</h2>
+  <p id="ratingPrompt"></p>
+
+  <div class="rating" id="ratingButtons"></div>
+  <div class="row small">
+    <span>1 · Not accurate</span>
+    <span>10 · Extremely accurate</span>
+  </div>
+  <p class="error" id="ratingError"></p>
+
+  <button class="primary" id="submitRating">
+    Submit My Rating ✦
+  </button>
+</section>
+
+<section class="card center" id="thanks" hidden>
+  <div class="eyebrow">Reflection complete</div>
+  <h2>✦</h2>
+  <h2>Thank you for reflecting.</h2>
+  <p>Your character reflection is complete.</p>
+  <button class="primary" id="restart">
+    Start a New Reflection
+  </button>
+</section>
+
+<footer>✦ Character Reflection Quiz ✦</footer>
+</main>
+
+<script>
+// THE TEN MULTIPLE-CHOICE QUESTIONS
+
+const questions = [
+  {
+    self:"How do you typically recharge after a long day?",
+    other:"How does this person typically recharge after a long day?",
+    choices:[
+      "Spending quiet time alone",
+      "Talking or spending time with others",
+      "Doing something creative or active",
+      "It depends on the day"
+    ]
+  },
+  {
+    self:"When facing a difficult decision, what guides you most?",
+    other:"When facing a difficult decision, what guides this person most?",
+    choices:[
+      "Logic and careful reasoning",
+      "Gut feelings and intuition",
+      "Advice from people I trust",
+      "A combination of all three"
+    ]
+  },
+  {
+    self:"How do you usually respond to criticism?",
+    other:"How does this person usually respond to criticism?",
+    choices:[
+      "I reflect on it and try to improve",
+      "I feel it deeply, even if I don't show it",
+      "I consider whether it seems fair",
+      "My response depends on who says it"
+    ]
+  },
+  {
+    self:"What motivates you most when working toward a goal?",
+    other:"What motivates this person most when working toward a goal?",
+    choices:[
+      "Personal growth and improvement",
+      "Making others proud or helping them",
+      "Achieving something meaningful",
+      "The satisfaction of finishing what I start"
+    ]
+  },
+  {
+    self:"How do you respond when plans unexpectedly change?",
+    other:"How does this person respond when plans unexpectedly change?",
+    choices:[
+      "I adapt quickly and go with it",
+      "I need a little time to adjust",
+      "I try to make a new plan right away",
+      "It depends on how important the plans were"
+    ]
+  },
+  {
+    self:"How comfortable are you expressing your emotions?",
+    other:"How comfortable is this person expressing their emotions?",
+    choices:[
+      "Very comfortable with most people",
+      "Comfortable with people I trust",
+      "I usually keep my feelings private",
+      "It depends on the emotion"
+    ]
+  },
+  {
+    self:"What role do you naturally take in a group?",
+    other:"What role does this person naturally take in a group?",
+    choices:[
+      "The organizer or leader",
+      "The listener who supports others",
+      "The creative idea person",
+      "The person who keeps everyone connected"
+    ]
+  },
+  {
+    self:"How often do you question your own decisions?",
+    other:"How often does this person question their own decisions?",
+    choices:[
+      "Rarely — I usually feel confident",
+      "Sometimes, especially with big decisions",
+      "Often — I like to consider alternatives",
+      "It varies depending on the situation"
+    ]
+  },
+  {
+    self:"Which quality matters most to you in relationships?",
+    other:"Which quality seems to matter most to this person in relationships?",
+    choices:[
+      "Honesty and trust",
+      "Loyalty and dependability",
+      "Understanding and empathy",
+      "Fun and shared experiences"
+    ]
+  },
+  {
+    self:"How well do you feel you understand yourself?",
+    other:"How well do you feel you understand this person?",
+    choices:[
+      "Extremely well",
+      "Pretty well, with a few surprises",
+      "Somewhat — there is still a lot to learn",
+      "I'm still figuring that out"
+    ]
+  }
+];
+
+// RESULT 1: EVERYONE WHO SELECTS MYSELF
+
+const resultSelf = [
+  `You have a side of yourself that others don't always
+  get to see. While you can feel confident in your
+  abilities, there are also moments when you question
+  whether you're making the right decisions. You often
+  have expectations for yourself that you don't
+  necessarily share with others.`,
+
+  `You appreciate having a sense of direction in your
+  life, but you also enjoy having the freedom to make
+  your own choices. Sometimes you find yourself
+  thinking about things that happened in the past or
+  wondering how certain situations could have turned
+  out differently.`,
+
+  `Although you have qualities you're proud of, there
+  are parts of yourself that you would like to improve.
+  You have interests and abilities that you haven't
+  fully explored, and you occasionally feel that you
+  could be getting more out of your potential. You
+  want to feel understood by the people around you,
+  but you don't always find it easy to explain
+  exactly what you're thinking.`
+];
+
+// RESULT 2: EVERYONE WHO SELECTS SOMEONE ELSE
+
+const resultOther = [
+  `{name} has different sides to their personality,
+  and not all of them are immediately obvious to the
+  people around them. While certain qualities are easy
+  for others to recognize, there are parts of their
+  character that tend to come out only in particular
+  situations or around certain people. They may act
+  differently depending on their surroundings and
+  how comfortable they feel.`,
+
+  `{name} values having people in their life they can
+  trust, although they don't always express how
+  important certain relationships are to them.
+  There are times when they prefer familiarity and
+  routine, but they can also appreciate a change
+  of pace when the circumstances are right.`,
+
+  `Although {name} can be understanding of other
+  people's perspectives, they also have personal
+  opinions and values that they aren't always
+  willing to compromise. They sometimes handle
+  situations differently than others might expect,
+  and their reactions can depend on things that
+  aren't immediately obvious. There are parts of
+  {name}'s personality that even the people closest
+  to them may not fully recognize.`
+];
+
+// WEBSITE FUNCTIONALITY
+
+const $ = id => document.getElementById(id);
+
+const screens = [
+  "welcome",
+  "quiz",
+  "loading",
+  "results",
+  "ratingScreen",
+  "thanks"
+];
+
+let personName = "";
+let perspective = "";
+let questionIndex = 0;
+let selectedAnswers = [];
+let rating = null;
+
+function showScreen(id) {
+  screens.forEach(screen => {
+    $(screen).hidden = screen !== id;
+  });
+  window.scrollTo(0,0);
+}
+
+function renderQuestion() {
+  const question = questions[questionIndex];
+
+  $("questionCount").textContent =
+    `${questionIndex + 1} / ${questions.length}`;
+
+  $("quizProgress").style.width =
+    `${(questionIndex + 1) / questions.length * 100}%`;
+
+  $("questionTitle").textContent =
+    perspective === "self" ? question.self : question.other;
+
+  $("answers").replaceChildren();
+
+  question.choices.forEach((choice,i) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "answer";
+
+    if (selectedAnswers[questionIndex] === i) {
+      button.classList.add("selected");
+    }
+
+    button.textContent = choice;
+
+    button.onclick = () => {
+      selectedAnswers[questionIndex] = i;
+      $("quizError").textContent = "";
+      renderQuestion();
+    };
+
+    $("answers").appendChild(button);
+  });
+
+  $("backButton").style.visibility =
+    questionIndex === 0 ? "hidden" : "visible";
+
+  $("nextButton").textContent =
+    questionIndex === questions.length - 1
+      ? "Calculate My Results ✦"
+      : "Continue →";
+}
+
+$("startForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  personName = $("personName").value.trim();
+  perspective = $("perspective").value;
+
+  if (!personName || !perspective) return;
+
+  questionIndex = 0;
+  selectedAnswers = Array(questions.length).fill(null);
+  rating = null;
+
+  renderQuestion();
+  showScreen("quiz");
+});
+
+$("backButton").onclick = () => {
+  if (questionIndex > 0) {
+    questionIndex--;
+    renderQuestion();
+  }
+};
+
+$("nextButton").onclick = () => {
+  if (selectedAnswers[questionIndex] === null) {
+    $("quizError").textContent =
+      "Please select an answer to continue.";
+    return;
+  }
+
+  $("quizError").textContent = "";
+
+  if (questionIndex < questions.length - 1) {
+    questionIndex++;
+    renderQuestion();
+  } else {
+    startLoading();
+  }
+};
+
+// FIVE-SECOND CALCULATING ANIMATION
+
+function startLoading() {
+  showScreen("loading");
+
+  const duration = 5000;
+  const start = performance.now();
+
+  const messages = [
+    "Reviewing your responses...",
+    "Identifying character patterns...",
+    "Preparing your reflection..."
+  ];
+
+  function animate(now) {
+    if ($("loading").hidden) return;
+
+    const fraction = Math.min((now - start) / duration,1);
+    const percent = Math.round(fraction * 100);
+
+    $("loadingFill").style.width = percent + "%";
+    $("loadingPercent").textContent = percent + "%";
+
+    $("loadingMessage").textContent =
+      messages[Math.min(2,Math.floor(fraction * 3))];
+
+    if (fraction < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      showResult();
+    }
+  }
+
+  $("loadingFill").style.width = "0%";
+  requestAnimationFrame(animate);
+}
+
+// SHOW ONE OF TWO PREDETERMINED RESULTS
+
+function showResult() {
+  $("resultHeading").textContent =
+    perspective === "self"
+      ? `${personName}, your reflection is here.`
+      : `A reflection of ${personName}`;
+
+  $("resultBody").replaceChildren();
+
+  const paragraphs =
+    perspective === "self" ? resultSelf : resultOther;
+
+  paragraphs.forEach(paragraph => {
+    const p = document.createElement("p");
+
+    p.textContent =
+      paragraph.replaceAll("{name}",personName);
+
+    $("resultBody").appendChild(p);
+  });
+
+  showScreen("results");
+}
+
+// ACCURACY RATING
+
+$("rateButton").onclick = () => {
+  $("ratingPrompt").textContent =
+    perspective === "self"
+      ? "How accurately do you feel this description represents you?"
+      : `How accurately do you feel this description represents ${personName}?`;
+
+  $("ratingButtons").replaceChildren();
+  rating = null;
+
+  for (let i = 1; i <= 10; i++) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = i;
+
+    button.onclick = () => {
+      rating = i;
+
+      [...$("ratingButtons").children].forEach((b,j) => {
+        b.classList.toggle("active",j + 1 === i);
       });
-      $('backButton').style.visibility=index===0?'hidden':'visible';
-      $('nextButton').textContent=index===questions.length-1?'Calculate My Results ✦':'Continue →';
-    }
-    $('startForm').addEventListener('submit',e=>{
-      e.preventDefault();
-      personName=$('personName').value.trim(); perspective=$('perspective').value;
-      if(!personName||!perspective)return;
-      index=0; selected=Array(questions.length).fill(null); rating=null;
-      renderQuestion(); show('quiz');
-    });
-    $('backButton').onclick=()=>{if(index>0){index--;renderQuestion();}};
-    $('nextButton').onclick=()=>{
-      if(selected[index]===null){$('quizError').textContent='Please choose an answer to continue.';return;}
-      $('quizError').textContent='';
-      if(index<questions.length-1){index++;renderQuestion();}else startLoading();
+
+      $("ratingError").textContent = "";
     };
-    function startLoading(){
-      show('loading'); const start=performance.now(); const duration=5000;
-      const messages=['Reviewing your responses...','Identifying character patterns...','Preparing your reflection...'];
-      function frame(now){
-        if(!$('loading').hidden){
-          const fraction=Math.min((now-start)/duration,1),pct=Math.round(fraction*100);
-          $('loadingFill').style.width=pct+'%'; $('loadingPercent').textContent=pct+'%';
-          $('loadingMessage').textContent=messages[Math.min(2,Math.floor(fraction*3))];
-          if(fraction<1)requestAnimationFrame(frame); else showResult();
-        }
-      }
-      requestAnimationFrame(frame);
-    }
-    function showResult(){
-      $('resultHeading').textContent=perspective==='self'?`${personName}, your reflection is here.`:`A reflection of ${personName}`;
-      $('resultBody').replaceChildren();
-      const paragraphs=perspective==='self'?resultSelf:resultOther;
-      paragraphs.forEach(text=>{const p=document.createElement('p');p.textContent=text.replaceAll('{name}',personName);$('resultBody').appendChild(p);});
-      show('results');
-    }
-    $('rateButton').onclick=()=>{
-      $('ratingPrompt').textContent=perspective==='self'?'How accurately do you feel this description represents you?':`How accurately do you feel this description represents ${personName}?`;
-      $('ratingButtons').replaceChildren();
-      for(let i=1;i<=10;i++){
-        const btn=document.createElement('button');btn.type='button';btn.textContent=i;btn.setAttribute('aria-label',`${i} out of 10`);
-        btn.onclick=()=>{rating=i;$('ratingError').textContent='';[...$('ratingButtons').children].forEach((b,j)=>{b.classList.toggle('active',j+1===i);b.setAttribute('aria-pressed',String(j+1===i));});};
-        btn.setAttribute('aria-pressed','false'); $('ratingButtons').appendChild(btn);
-      }
-      show('ratingScreen');
-    };
-    $('submitRating').onclick=()=>{
-      if(rating===null){$('ratingError').textContent='Please select a rating before submitting.';return;}
-      // The rating is intentionally NOT sent anywhere or stored permanently.
-      show('thanks');
-    };
-    $('restart').onclick=()=>{$('startForm').reset();show('welcome');};
-  </script>
+
+    $("ratingButtons").appendChild(button);
+  }
+
+  showScreen("ratingScreen");
+};
+
+$("submitRating").onclick = () => {
+  if (rating === null) {
+    $("ratingError").textContent =
+      "Please select a rating before submitting.";
+    return;
+  }
+
+  // Rating is not saved or sent to a database.
+  showScreen("thanks");
+};
+
+$("restart").onclick = () => {
+  $("startForm").reset();
+  showScreen("welcome");
+};
+</script>
 </body>
 </html>
