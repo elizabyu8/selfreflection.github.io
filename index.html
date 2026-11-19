@@ -776,21 +776,49 @@ $("rateButton").onclick = () => {
   showScreen("ratingScreen");
 };
 
-$("submitRating").onclick = () => {
+
+const GOOGLE_SCRIPT_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+
+$("submitRating").onclick = async () => {
   if (rating === null) {
     $("ratingError").textContent =
       "Please select a rating before submitting.";
     return;
   }
 
-  // Rating is not saved or sent to a database.
-  showScreen("thanks");
-};
+  const button = $("submitRating");
+  button.disabled = true;
+  button.textContent = "Submitting...";
 
-$("restart").onclick = () => {
-  $("startForm").reset();
-  showScreen("welcome");
+  const answers = selectedAnswers.map((answer, index) => {
+    return questions[index].choices[answer];
+  });
+
+  const data = {
+    name: personName,
+    quizType: perspective === "self" ? "Myself" : "Someone Else",
+    answers: answers,
+    result: perspective === "self" ? "Result 1" : "Result 2",
+    rating: rating
+  };
+
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(data)
+    });
+
+    showScreen("thanks");
+
+  } catch (error) {
+    $("ratingError").textContent =
+      "Could not send your rating. Please try again.";
+  } finally {
+    button.disabled = false;
+    button.textContent = "Submit My Rating ✦";
+  }
 };
-</script>
-</body>
-</html>
